@@ -6,7 +6,7 @@
 /*   By: jchene <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 14:30:43 by jchene            #+#    #+#             */
-/*   Updated: 2020/01/31 14:33:05 by jchene           ###   ########.fr       */
+/*   Updated: 2020/02/07 13:22:57 by jchene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,29 +71,30 @@ int		checkbuff(char *buff, char **line)
 
 int		get_next_line(int fd, char **line)
 {
-	static char	*statbuff;
+	static char	*statbuff[4096];
 	int			check;
 	int			count;
 
 	if (fd < 0 || line == NULL || BUFFER_SIZE == 0)
 		return (-1);
 	*line = NULL;
-	if (!statbuff)
-		if (!(statbuff = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char))))
+	if (!statbuff[fd])
+		if (!(statbuff[fd] = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char))))
 			return (-1);
-	if ((check = checkbuff(statbuff, line)))
+	if ((check = checkbuff(statbuff[fd], line)))
 		return ((check = 1) ? 1 : -1);
-	while ((count = read(fd, statbuff, BUFFER_SIZE)))
+	while ((count = read(fd, statbuff[fd], BUFFER_SIZE)))
 	{
 		if (count == -1)
 			return (-1);
-		statbuff[count] = '\0';
-		if ((check = checkbuff(statbuff, line)))
+		statbuff[fd][count] = '\0';
+		if ((check = checkbuff(statbuff[fd], line)))
 			return ((check = 1) ? 1 : -1);
 	}
 	if (!*line)
 		if (!(*line = (char *)ft_calloc(1, sizeof(char))))
 			return (-1);
-	free(statbuff);
+	free(statbuff[fd]);
+	statbuff[fd] = NULL;
 	return (0);
 }

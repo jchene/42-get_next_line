@@ -6,7 +6,7 @@
 /*   By: jchene <marvin@42.fr>                      +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/23 14:30:43 by jchene            #+#    #+#             */
-/*   Updated: 2020/02/03 16:15:44 by jchene           ###   ########.fr       */
+/*   Updated: 2020/02/06 16:43:27 by jchene           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,7 +71,7 @@ int		checkbuff(char *buff, char **line)
 
 int		get_next_line(int fd, char **line)
 {
-	static char	*statbuff[4095];
+	static char	*statbuff[4096];
 	int			check;
 	int			count;
 
@@ -82,18 +82,19 @@ int		get_next_line(int fd, char **line)
 		if (!(statbuff[fd] = (char *)ft_calloc(BUFFER_SIZE + 1, sizeof(char))))
 			return (-1);
 	if ((check = checkbuff(statbuff[fd], line)))
-		return (check);
+		return ((check = 1) ? 1 : -1);
 	while ((count = read(fd, statbuff[fd], BUFFER_SIZE)))
 	{
 		if (count == -1)
 			return (-1);
 		statbuff[fd][count] = '\0';
 		if ((check = checkbuff(statbuff[fd], line)))
-			return (check);
+			return ((check = 1) ? 1 : -1);
 	}
 	if (!*line)
 		if (!(*line = (char *)ft_calloc(1, sizeof(char))))
 			return (-1);
 	free(statbuff[fd]);
+	statbuff[fd] = NULL;
 	return (0);
 }
